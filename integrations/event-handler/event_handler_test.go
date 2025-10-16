@@ -135,6 +135,9 @@ func (s *EventHandlerSuite) startApp() {
 	app, err := NewApp(&s.appConfig, slog.Default())
 	require.NoError(t, err)
 
+	t.Cleanup(func() {
+		app.Close()
+	})
 	integration.RunAndWaitReady(s.T(), app)
 }
 
@@ -146,6 +149,9 @@ type nonce any
 func (s *EventHandlerSuite) TestEvent() {
 	ctx, cancel := context.WithCancel(context.Background())
 	s.T().Cleanup(cancel)
+	s.T().Cleanup(func() {
+		s.AuthHelper.Auth().Close()
+	})
 
 	tests := []struct {
 		name          string
